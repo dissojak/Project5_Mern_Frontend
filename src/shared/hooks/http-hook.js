@@ -1,23 +1,28 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const useHttp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
-  const activeHttpRequests = useRef([]);
+  const activeHttpRequests = []; // Using an array to store controllers
 
   const sendRequest = useCallback(
     async (url, method = "GET", body = null, headers = {}) => {
       setIsLoading(true);
-      const httpAbortController = new AbortController();
-      activeHttpRequests.currentRequest.push(httpAbortController);
+      const httpAbortController = new AbortController(); // Create a new controller for each request
+      activeHttpRequests.push(httpAbortController); // Store the controller
+
       try {
         const response = await fetch(url, {
           method,
           body,
           headers,
-          signal: httpAbortController.signal,
+          signal: httpAbortController.signal, // Use the signal from the controller
         });
         const responseData = await response.json();
+
+        // Remove the used controller from the array
+        activeHttpRequests.splice(activeHttpRequests.indexOf(httpAbortController), 1);
+
         if (!response.ok) {
           throw new Error(responseData.message);
         }
@@ -36,11 +41,14 @@ export const useHttp = () => {
     setError(null);
   };
 
+  // Abort all pending requests when the component unmounts
+  // This ensures that no pending requests will update the state after the component has unmounted
   useEffect(() => {
-    return () => {};
-    activeHttpRequests.current.forEach((abortCtrl) => {
-      abortCtrl.abort();
-    });
+    return () => {
+      activeHttpRequests.forEach((abortCtrl) => {
+        abortCtrl.abort();
+      });
+    };
   }, []);
 
   return {

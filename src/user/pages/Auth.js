@@ -19,7 +19,7 @@ const Auth = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttp();
-  
+
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -84,6 +84,7 @@ const Auth = () => {
           JSON.stringify({
             name: formState.inputs.name.value,
             email: formState.inputs.email.value,
+            image: formState.inputs.image.value,
             pw: formState.inputs.password.value,
           }),
           {
@@ -104,6 +105,7 @@ const Auth = () => {
         <hr />
         <form onSubmit={authSubmitHandler}>
           {!isLoginMode && (
+            <>
             <Input
               element="input"
               id="name"
@@ -113,6 +115,16 @@ const Auth = () => {
               errorText="Please enter a name."
               onInput={inputHandler}
             />
+            <Input
+              element="input"
+              id="image"
+              type="text"
+              label="Your Image"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter an Image."
+              onInput={inputHandler}
+            />
+            </>
           )}
           <Input
             element="input"

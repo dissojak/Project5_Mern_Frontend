@@ -21,12 +21,13 @@ export const useHttp = () => {
         if (!response.ok) {
           throw new Error(responseData.message);
         }
-
+        setIsLoading(false);
         return responseData;
       } catch (e) {
         setError(e.message);
+        setIsLoading(false);
+        throw e;
       }
-      setIsLoading(false);
     },
     []
   );
@@ -37,7 +38,9 @@ export const useHttp = () => {
 
   useEffect(() => {
     return () => {};
-    activeHttpRequests.current.forEach(abortCtrl=>{abortCtrl.abort();});
+    activeHttpRequests.current.forEach((abortCtrl) => {
+      abortCtrl.abort();
+    });
   }, []);
 
   return {

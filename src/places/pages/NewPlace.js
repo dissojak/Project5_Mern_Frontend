@@ -1,4 +1,5 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
+import { useHistory } from "react-router-dom/cjs/react-router-dom";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
@@ -34,10 +35,11 @@ const NewPlace = () => {
 
   const { isLoading, error, sendRequest, clearError } = useHttp();
   const auth = useContext(AuthContext);
+  const history = useHistory();
 
   const placeSubmitHandler = async (event) => {
     event.preventDefault();
-    
+
     // console.log(auth);
     // console.log(auth.userId);
     try {
@@ -56,6 +58,7 @@ const NewPlace = () => {
         }
       );
       //redirect
+      history.push('/');
     } catch (e) {}
   };
 

@@ -23,7 +23,11 @@ const UserPlaces = () => {
       } catch (e) {}
     };
     req();
-  }, [sendRequest,userId]);
+  }, [sendRequest, userId]);
+
+  const deletPlaceHandler = (Pid) => {
+    setPlaces((prevPlaces) => prevPlaces.filter(place => place.id !== Pid));
+  };
 
   return (
     <>
@@ -33,7 +37,9 @@ const UserPlaces = () => {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && places && <PlaceList items={places} />}
+      {!isLoading && places && (
+        <PlaceList items={places} onDeletePlace={deletPlaceHandler} />
+      )}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import Input from "../../shared/components/FormElements/Input";
@@ -6,6 +6,7 @@ import Button from "../../shared/components/FormElements/Button";
 // import Card from '../../shared/components/UIElements/Card';
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { AuthContext } from "../../shared/context/auth-context";
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH,
@@ -17,8 +18,10 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom";
 
 const UpdatePlace = () => {
   const { isLoading, error, sendRequest, clearError } = useHttp();
+  const [place, setPlace] = useState();
   const placeId = useParams().placeId;
-  const history=useHistory()
+  const history = useHistory();
+  const auth = useContext(AuthContext);
 
   // eslint-disable-next-line
   const [formState, inputHandler, setFormData] = useForm(
@@ -35,23 +38,17 @@ const UpdatePlace = () => {
     false
   );
 
-  // useEffect(() => {
-  //   if (identifiedPlace) {
-  //     setFormData(
-  //       {
-  //         title: {
-  //           value: identifiedPlace.title,
-  //           isValid: true
-  //         },
-  //         description: {
-  //           value: identifiedPlace.description,
-  //           isValid: true
-  //         }
-  //       },
-  //       true
-  //     );
-  //   }
-  // }, [setFormData, identifiedPlace]);
+  useEffect(() => {
+    const req = async () => {
+      try {
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/places/" + placeId
+        );
+        setPlace(responseData.place);
+      } catch (e) {}
+    };
+    req();
+  }, [sendRequest, setFormData, placeId]);
 
   const placeUpdateSubmitHandler = async (event) => {
     event.preventDefault();
@@ -69,7 +66,7 @@ const UpdatePlace = () => {
           "Content-Type": "application/json",
         }
       );
-      history.push("/places");
+      history.push("/"+auth.userId+"/places");
     } catch (e) {}
   };
 
@@ -81,7 +78,7 @@ const UpdatePlace = () => {
           <LoadingSpinner />
         </div>
       )}
-      <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
+      {!isLoading && place && <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
         <Input
           id="title"
           element="input"
@@ -90,8 +87,8 @@ const UpdatePlace = () => {
           validators={[VALIDATOR_REQUIRE()]}
           errorText="Please enter a valid title."
           onInput={inputHandler}
-          initialValue={formState.inputs.title.value}
-          initialValid={formState.inputs.title.isValid}
+          initialValue={place.title}
+          initialValid={true}
         />
         <Input
           id="description"
@@ -100,8 +97,8 @@ const UpdatePlace = () => {
           validators={[VALIDATOR_MINLENGTH(5)]}
           errorText="Please enter a valid description (min. 5 characters)."
           onInput={inputHandler}
-          initialValue={formState.inputs.description.value}
-          initialValid={formState.inputs.description.isValid}
+          initialValue={place.description}
+          initialValid={true}
         />
         <Input
           id="image"
@@ -111,13 +108,13 @@ const UpdatePlace = () => {
           validators={[VALIDATOR_REQUIRE()]}
           errorText="Please enter a valid image Url."
           onInput={inputHandler}
-          initialValue={formState.inputs.title.value}
-          initialValid={formState.inputs.title.isValid}
+          initialValue={place.image}
+          initialValid={true}
         />
         <Button type="submit" disabled={!formState.isValid}>
           UPDATE PLACE
         </Button>
-      </form>
+      </form>}
     </>
   );
 };

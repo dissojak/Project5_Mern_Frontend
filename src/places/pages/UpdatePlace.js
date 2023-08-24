@@ -20,6 +20,7 @@ const UpdatePlace = () => {
   const placeId = useParams().placeId;
   const history=useHistory()
 
+  // eslint-disable-next-line
   const [formState, inputHandler, setFormData] = useForm(
     {
       title: {

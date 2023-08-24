@@ -5,12 +5,23 @@ import Button from '../../shared/components/FormElements/Button';
 import Modal from '../../shared/components/UIElements/Modal';
 import Map from '../../shared/components/UIElements/Map';
 import { AuthContext } from '../../shared/context/auth-context';
+
+import { useHttp } from "../../shared/hooks/http-hook";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+
 import './PlaceItem.css';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom';
+import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
 
 const PlaceItem = props => {
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const { isLoading, error, sendRequest, clearError } = useHttp();
+  const placeId = useParams().placeId;
+  const history=useHistory();
 
   const openMapHandler = () => setShowMap(true);
 
@@ -24,13 +35,26 @@ const PlaceItem = props => {
     setShowConfirmModal(false);
   };
 
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
+    console.log(placeId);
+    try {
+      await sendRequest(
+        "http://localhost:5000/api/places/" + placeId,
+        "DELETE"
+        );
+      history.push("/places");
+    } catch (e) {}
     setShowConfirmModal(false);
-    console.log('DELETING...');
   };
 
   return (
     <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
       <Modal
         show={showMap}
         onCancel={closeMapHandler}

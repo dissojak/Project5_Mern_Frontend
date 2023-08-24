@@ -1,27 +1,25 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from "react";
 
-import Card from '../../shared/components/UIElements/Card';
-import Button from '../../shared/components/FormElements/Button';
-import Modal from '../../shared/components/UIElements/Modal';
-import Map from '../../shared/components/UIElements/Map';
-import { AuthContext } from '../../shared/context/auth-context';
+import Card from "../../shared/components/UIElements/Card";
+import Button from "../../shared/components/FormElements/Button";
+import Modal from "../../shared/components/UIElements/Modal";
+import Map from "../../shared/components/UIElements/Map";
+import { AuthContext } from "../../shared/context/auth-context";
 
 import { useHttp } from "../../shared/hooks/http-hook";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
-import './PlaceItem.css';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
-import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
+import "./PlaceItem.css";
+// import { useHistory } from "react-router-dom/cjs/react-router-dom";
 
-const PlaceItem = props => {
+const PlaceItem = (props) => {
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const { isLoading, error, sendRequest, clearError } = useHttp();
-  const placeId = useParams().placeId;
-  const history=useHistory();
+  // const history = useHistory();
 
   const openMapHandler = () => setShowMap(true);
 
@@ -36,25 +34,19 @@ const PlaceItem = props => {
   };
 
   const confirmDeleteHandler = async () => {
-    console.log(placeId);
+    setShowConfirmModal(false);
     try {
       await sendRequest(
-        "http://localhost:5000/api/places/" + placeId,
+        "http://localhost:5000/api/places/" + props.id,
         "DELETE"
-        );
-      history.push("/places");
+      );
+      props.onDelete(props.id);
     } catch (e) {}
-    setShowConfirmModal(false);
   };
 
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
-      {isLoading && (
-        <div className="center">
-          <LoadingSpinner />
-        </div>
-      )}
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
@@ -90,6 +82,7 @@ const PlaceItem = props => {
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img src={props.image} alt={props.title} />
           </div>

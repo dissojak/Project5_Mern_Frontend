@@ -13,6 +13,7 @@ import {
 import { useForm } from "../../shared/hooks/form-hook";
 import { useHttp } from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/context/auth-context";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 import "./Auth.css";
 
 const Auth = () => {
@@ -127,6 +128,7 @@ const Auth = () => {
             />
             </>
           )}
+          {!isLoginMode && <ImageUpload center id='imageUpload' />}
           <Input
             element="input"
             id="email"

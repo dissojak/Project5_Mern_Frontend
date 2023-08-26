@@ -41,6 +41,8 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image:undefined,
+          imageUpload:undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -52,6 +54,14 @@ const Auth = () => {
             value: "",
             isValid: false,
           },
+          image:{
+            value: "",
+            isValid: false,
+          },
+          imageUpload:{
+            value: null,
+            isValid: false,
+          }
         },
         false
       );
@@ -108,6 +118,7 @@ const Auth = () => {
         <form onSubmit={authSubmitHandler}>
           {!isLoginMode && (
             <>
+            {!isLoginMode && <ImageUpload center id='imageUpload' onInput={inputHandler} />}
             <Input
               element="input"
               id="name"
@@ -128,7 +139,7 @@ const Auth = () => {
             />
             </>
           )}
-          {!isLoginMode && <ImageUpload center id='imageUpload' />}
+          
           <Input
             element="input"
             id="email"
